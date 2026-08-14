@@ -69,6 +69,9 @@
   .row > div{ flex:1; min-width:0; }
   .hint{ font-size:11.5px; color:var(--muted); margin-top:7px; line-height:1.45; }
   .hint.err{ color:#9b3d2b; }
+  .choice-row{ display:flex; gap:20px; margin:2px 0 4px; }
+  .choice{ display:flex; align-items:center; gap:7px; font-size:13.5px; font-weight:600; text-transform:none; letter-spacing:0; color:var(--ink); margin:0; }
+  .choice input{ width:auto; margin:0; }
   button{
     font-family:inherit;
     font-size:14px;
@@ -104,7 +107,7 @@
 <body>
 <div class="wrap">
   <h1>Priesthood Line of Authority</h1>
-  <p class="lede">Turn a line-of-authority PDF into a 4×6 keepsake for a child's ordination. Everything runs in your browser — nothing is uploaded anywhere.</p>
+  <p class="lede">Turn a line-of-authority PDF into a 4×6 keepsake — print it as-is for yourself, or add one more link for a child's ordination. Everything runs in your browser — nothing is uploaded anywhere.</p>
 
   <div class="card">
     <h2><span class="step">1</span>Upload the line of authority PDF</h2>
@@ -128,32 +131,36 @@ Apostle · 1829 · b. 23 Dec 1805
   </div>
 
   <div class="card">
-    <h2><span class="step">3</span>The child's ordination</h2>
-    <label>Full name</label>
-    <input type="text" id="childName" placeholder="e.g. William Alexander Nielson">
-    <div class="row">
-      <div>
-        <label>Office</label>
-        <select id="office">
-          <option value="">Select…</option>
-          <optgroup label="Aaronic Priesthood">
-            <option value="Aaronic|Deacon">Deacon</option>
-            <option value="Aaronic|Teacher">Teacher</option>
-            <option value="Aaronic|Priest">Priest</option>
-          </optgroup>
-          <optgroup label="Melchizedek Priesthood">
-            <option value="Melchizedek|Elder">Elder</option>
-            <option value="Melchizedek|High Priest">High Priest</option>
-            <option value="Melchizedek|Seventy">Seventy</option>
-            <option value="Melchizedek|Bishop">Bishop</option>
-            <option value="Melchizedek|Patriarch">Patriarch</option>
-            <option value="Melchizedek|Apostle">Apostle</option>
-          </optgroup>
-        </select>
-      </div>
-      <div>
-        <label>Date ordained</label>
-        <input type="text" id="ordDate" placeholder="7 January 2025">
+    <h2><span class="step">3</span>Who is this for?</h2>
+    <p class="desc">Print your own line of authority as-is, or add one more link at the end for a child you've ordained.</p>
+    <div class="choice-row">
+      <label class="choice"><input type="radio" name="printFor" id="forSelf" value="self" checked>Myself</label>
+      <label class="choice"><input type="radio" name="printFor" id="forChild" value="child">A child I ordained</label>
+    </div>
+    <div class="hint" id="selfHint">We'll use the last person in the chain above as who this certificate is for.</div>
+    <div id="childFields" hidden>
+      <label>Full name</label>
+      <input type="text" id="childName" placeholder="e.g. William Alexander Nielson">
+      <div class="row">
+        <div>
+          <label>Office</label>
+          <select id="office">
+            <option value="">Select…</option>
+            <optgroup label="Aaronic Priesthood">
+              <option value="Aaronic|Deacon">Deacon</option>
+              <option value="Aaronic|Teacher">Teacher</option>
+              <option value="Aaronic|Priest">Priest</option>
+            </optgroup>
+            <optgroup label="Melchizedek Priesthood">
+              <option value="Melchizedek|Elder">Elder</option>
+              <option value="Melchizedek|High Priest">High Priest</option>
+            </optgroup>
+          </select>
+        </div>
+        <div>
+          <label>Date ordained</label>
+          <input type="text" id="ordDate" placeholder="7 January 2025">
+        </div>
       </div>
     </div>
   </div>
@@ -165,7 +172,7 @@ Apostle · 1829 · b. 23 Dec 1805
       <button class="ghost" id="genBtn" type="button">Update preview</button>
       <button class="primary" id="dlBtn" type="button">Download 4×6 image</button>
     </div>
-    <div class="next-note">To make one for another child, just change the name, office, and date above and download again — no need to re-upload the PDF.</div>
+    <div class="next-note">To print another copy — for yourself or a different child — just change the selection above and download again. No need to re-upload the PDF.</div>
   </div>
 
   <p class="privacy">Your PDF is read locally in your browser and is never sent to a server.</p>
@@ -190,6 +197,10 @@ const canvas = document.getElementById('previewCanvas');
 const ctx = canvas.getContext('2d');
 const genBtn = document.getElementById('genBtn');
 const dlBtn = document.getElementById('dlBtn');
+const forSelfRadio = document.getElementById('forSelf');
+const forChildRadio = document.getElementById('forChild');
+const childFields = document.getElementById('childFields');
+const selfHint = document.getElementById('selfHint');
 
 /* ---------------- PDF text extraction ---------------- */
 
@@ -340,46 +351,50 @@ function render() {
   ctx.fillStyle = '#fffdf9';
   ctx.fillRect(0, 0, W, H);
 
+  // Kept well clear of the physical edge -- many print services crop a bleed
+  // margin off borderless prints, which was clipping the border before.
+  const M1 = 100, M2 = 118;
   ctx.strokeStyle = RULE;
   ctx.lineWidth = 4;
-  ctx.strokeRect(66, 66, W - 132, H - 132);
+  ctx.strokeRect(M1, M1, W - M1 * 2, H - M1 * 2);
   ctx.lineWidth = 1.5;
-  ctx.strokeRect(84, 84, W - 168, H - 168);
+  ctx.strokeRect(M2, M2, W - M2 * 2, H - M2 * 2);
 
-  let y = 178;
-  fitAndDrawCentered('PRIESTHOOD LINE OF AUTHORITY', cx, y, 26, '', W - 200, 7, MUTED);
+  let y = 210;
+  fitAndDrawCentered('PRIESTHOOD LINE OF AUTHORITY', cx, y, 26, '', W - 260, 7, MUTED);
 
   y += 36;
   ornament(cx, y, 30, 5, RULE);
 
-  const officeVal = officeSel.value;
-  const parts = officeVal ? officeVal.split('|') : ['Aaronic', ''];
-  const ptype = parts[0], office = parts[1] || '';
-  const cName = childName.value.trim() || 'Child\u2019s Full Name';
-  const dateStr = ordDate.value.trim() || 'Ordination date';
-
-  y += 62;
-  fitAndDrawCentered(cName, cx, y, 46, '', W - 260, 1, INK);
-
   y += 40;
-  fitAndDrawCentered(ptype + ' Priesthood  ·  ' + (office || 'Office'), cx, y, 25, 'italic', W - 220, 0, MUTED);
-
-  y += 32;
-  fitAndDrawCentered('Ordained ' + dateStr, cx, y, 25, 'italic', W - 220, 0, MUTED);
-
-  y += 42;
   ctx.strokeStyle = RULE;
   ctx.lineWidth = 1.3;
   ctx.beginPath(); ctx.moveTo(cx - 200, y); ctx.lineTo(cx + 200, y); ctx.stroke();
 
   const chainTop = y + 44;
-  const footerOrnY = H - 128;
+  const footerOrnY = H - 150;
   const chainBottom = footerOrnY - 56;
 
-  const entries = textToEntries(chainText.value);
-  entries.push({ name: cName, detail: [(office || 'Office') + '  ·  ' + dateStr] });
+  let entries = textToEntries(chainText.value);
 
-  drawChain(entries, cx, chainTop, chainBottom, W - 220);
+  if (forChildRadio.checked) {
+    const officeVal = officeSel.value;
+    const parts = officeVal ? officeVal.split('|') : ['Aaronic', ''];
+    const ptype = parts[0], office = parts[1] || '';
+    const cName = childName.value.trim() || 'Child\u2019s Full Name';
+    const dateStr = ordDate.value.trim() || 'Ordination date';
+    entries = entries.concat([{
+      name: cName,
+      detail: [ptype + ' Priesthood' + '\u2002\u00b7\u2002' + (office || 'Office'), 'Ordained ' + dateStr]
+    }]);
+  }
+
+  // Reverse for display: Jesus Christ anchors the chain at the bottom in
+  // large type, and the person this certificate is for appears once, at
+  // the top -- instead of being drawn a second time as a separate header.
+  entries = entries.slice().reverse();
+
+  drawChain(entries, cx, chainTop, chainBottom, W - 300);
 
   ornament(cx, footerOrnY, 26, 4, RULE);
 }
@@ -389,8 +404,8 @@ function drawChain(entries, cx, top, bottom, maxWidth) {
   const NAME_SZ = 30, DET_SZ = 22, NAME_LEAD = 37, DET_LEAD = 28;
 
   const baseSizes = entries.map((e, i) => {
-    if (i === 0) return 46;
-    if (i === n - 1) return NAME_SZ + 5;
+    if (i === n - 1) return 46;       // Jesus Christ, anchoring the chain at the bottom
+    if (i === 0) return NAME_SZ + 5;  // the person this certificate is for, at the top
     return NAME_SZ;
   });
   const baseLeads = baseSizes.map(s => s * (NAME_LEAD / NAME_SZ));
@@ -421,9 +436,10 @@ function drawChain(entries, cx, top, bottom, maxWidth) {
 
   entries.forEach((e, i) => {
     const isLast = i === n - 1;
+    const isFeatured = i === 0;
     y += sizes[i];
     const fitted = fitAndDrawCentered(e.name, cx, y, sizes[i], '', maxWidth, 0.4, INK);
-    if (isLast) {
+    if (isFeatured) {
       ctx.font = fitted + 'px ' + FONT;
       const w = measureTracked(e.name, 0.4);
       diamond(cx - w / 2 - 16, y - fitted * 0.32, 3, RULE);
@@ -470,6 +486,13 @@ pdfInput.addEventListener('change', async (e) => {
   }
 });
 
+function updateModeUI() {
+  const isChild = forChildRadio.checked;
+  childFields.hidden = !isChild;
+  selfHint.hidden = isChild;
+}
+[forSelfRadio, forChildRadio].forEach(r => r.addEventListener('change', () => { updateModeUI(); scheduleRender(); }));
+
 let renderTimer;
 function scheduleRender() {
   clearTimeout(renderTimer);
@@ -481,13 +504,22 @@ genBtn.addEventListener('click', render);
 
 dlBtn.addEventListener('click', () => {
   render();
-  const safe = (childName.value.trim() || 'child').replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase();
+  const isChild = forChildRadio.checked;
+  let nameForFile = 'line-of-authority';
+  if (isChild) {
+    nameForFile = childName.value.trim() || 'child';
+  } else {
+    const selfEntries = textToEntries(chainText.value);
+    if (selfEntries.length) nameForFile = selfEntries[selfEntries.length - 1].name;
+  }
+  const safe = nameForFile.replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase();
   const link = document.createElement('a');
   link.download = 'priesthood-line-of-authority-' + safe + '-4x6.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
 });
 
+updateModeUI();
 render();
 </script>
 </body>
