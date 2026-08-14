@@ -140,7 +140,7 @@ Apostle · 1829 · b. 23 Dec 1805
     <div class="hint" id="selfHint">We'll use the last person in the chain above as who this certificate is for.</div>
     <div id="childFields" hidden>
       <label>Full name</label>
-      <input type="text" id="childName" placeholder="e.g. William Alexander Nielson">
+      <input type="text" id="childName" placeholder="e.g. Ezra Taft Benson">
       <div class="row">
         <div>
           <label>Office</label>
@@ -442,8 +442,8 @@ function drawChain(entries, cx, top, bottom, maxWidth) {
     if (isFeatured) {
       ctx.font = fitted + 'px ' + FONT;
       const w = measureTracked(e.name, 0.4);
-      diamond(cx - w / 2 - 16, y - fitted * 0.32, 3, RULE);
-      diamond(cx + w / 2 + 16, y - fitted * 0.32, 3, RULE);
+      diamond(cx - w / 2 - 16 * scale, y - fitted * 0.32, 3 * scale, RULE);
+      diamond(cx + w / 2 + 16 * scale, y - fitted * 0.32, 3 * scale, RULE);
     }
     y += leads[i] - sizes[i];
 
@@ -454,10 +454,13 @@ function drawChain(entries, cx, top, bottom, maxWidth) {
     });
 
     if (!isLast) {
+      // Scaled with the rest of the layout so the tick stays proportional
+      // to the text however many links are in the chain.
       ctx.strokeStyle = RULE;
-      ctx.lineWidth = 1;
+      ctx.lineWidth = Math.max(0.75, scale);
       const midY = y + usedGap / 2;
-      ctx.beginPath(); ctx.moveTo(cx, midY - 9); ctx.lineTo(cx, midY + 9); ctx.stroke();
+      const tickHalf = Math.max(5, 9 * scale);
+      ctx.beginPath(); ctx.moveTo(cx, midY - tickHalf); ctx.lineTo(cx, midY + tickHalf); ctx.stroke();
       y += usedGap;
     }
   });
