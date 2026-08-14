@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Priesthood Line of Authority — 4×6 Printable</title>
+<style>
+  :root{
+    --ink:#1c1b19;
+    --muted:#6f6a61;
+    --rule:#a39a8a;
+    --paper:#fffdf9;
+    --shell:#f2efe9;
+    --line:#ddd7cb;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--shell);
+    color:var(--ink);
+    font-family:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Times New Roman',serif;
+    padding:26px 16px 70px;
+  }
+  .wrap{ max-width:560px; margin:0 auto; }
+  h1{
+    font-size:21px; margin:0 0 4px; letter-spacing:.01em; font-weight:600;
+  }
+  .lede{
+    color:var(--muted); font-size:13.5px; line-height:1.5; margin:0 0 22px;
+  }
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px 18px 20px;
+    margin-bottom:14px;
+  }
+  .card h2{
+    font-size:14.5px; margin:0 0 3px; display:flex; align-items:center; font-weight:600;
+  }
+  .card .desc{ font-size:12px; color:var(--muted); margin:0 0 12px; line-height:1.5; }
+  .step{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:20px; height:20px; border-radius:50%;
+    background:var(--ink); color:#fff; font-size:11px; font-weight:700;
+    margin-right:8px; flex:none;
+  }
+  label{ display:block; font-size:11.5px; font-weight:700; color:#3a3833; margin:12px 0 6px; text-transform:uppercase; letter-spacing:.04em; }
+  label:first-of-type{ margin-top:0; }
+  input[type=text], input[type=file], textarea, select{
+    width:100%;
+    font-family:inherit;
+    font-size:14.5px;
+    padding:10px 11px;
+    border:1px solid var(--line);
+    border-radius:7px;
+    background:#fffefc;
+    color:var(--ink);
+  }
+  input[type=file]{ padding:8px 8px; font-size:13px; }
+  textarea{
+    min-height:230px;
+    line-height:1.55;
+    font-size:12.5px;
+    resize:vertical;
+    white-space:pre;
+  }
+  .row{ display:flex; gap:10px; }
+  .row > div{ flex:1; min-width:0; }
+  .hint{ font-size:11.5px; color:var(--muted); margin-top:7px; line-height:1.45; }
+  .hint.err{ color:#9b3d2b; }
+  button{
+    font-family:inherit;
+    font-size:14px;
+    font-weight:700;
+    padding:12px 18px;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
+  }
+  .primary{ background:var(--ink); color:#fff; width:100%; }
+  .primary:disabled{ background:#c8c3b8; cursor:not-allowed; }
+  .ghost{ background:#fff; border:1px solid var(--line); color:var(--ink); width:100%; }
+  .actions{ display:flex; flex-direction:column; gap:9px; margin-top:4px; }
+  .preview-card{ display:flex; flex-direction:column; align-items:center; }
+  #stage{
+    width:100%; display:flex; justify-content:center; padding:6px 0 4px;
+  }
+  #previewCanvas{
+    width:240px; height:360px;
+    box-shadow:0 10px 28px rgba(20,18,14,.18);
+    border-radius:1px;
+    background:#fff;
+  }
+  .privacy{
+    font-size:11.5px; color:var(--muted); text-align:center; margin-top:14px; line-height:1.5;
+  }
+  .next-note{
+    font-size:12px; color:var(--muted); background:var(--shell); border:1px solid var(--line);
+    border-radius:8px; padding:10px 12px; margin-top:10px; line-height:1.5;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Priesthood Line of Authority</h1>
+  <p class="lede">Turn a line-of-authority PDF into a 4×6 keepsake for a child's ordination. Everything runs in your browser — nothing is uploaded anywhere.</p>
+
+  <div class="card">
+    <h2><span class="step">1</span>Upload the line of authority PDF</h2>
+    <p class="desc">Works best with the standard printout from the Church's system.</p>
+    <input type="file" id="pdfInput" accept="application/pdf">
+    <div class="hint" id="uploadStatus"></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="step">2</span>Review the chain</h2>
+    <p class="desc">Pulled straight from the PDF — double-check it. One name per line; office/date/description lines go underneath it; leave a blank line between people.</p>
+    <textarea id="chainText" placeholder="Jesus Christ
+
+Peter, James, and John
+ordained Apostles by the Savior during His earthly ministry
+
+Joseph Smith Jr.
+Apostle · 1829 · b. 23 Dec 1805
+
+..."></textarea>
+  </div>
+
+  <div class="card">
+    <h2><span class="step">3</span>The child's ordination</h2>
+    <label>Full name</label>
+    <input type="text" id="childName" placeholder="e.g. William Alexander Nielson">
+    <div class="row">
+      <div>
+        <label>Office</label>
+        <select id="office">
+          <option value="">Select…</option>
+          <optgroup label="Aaronic Priesthood">
+            <option value="Aaronic|Deacon">Deacon</option>
+            <option value="Aaronic|Teacher">Teacher</option>
+            <option value="Aaronic|Priest">Priest</option>
+          </optgroup>
+          <optgroup label="Melchizedek Priesthood">
+            <option value="Melchizedek|Elder">Elder</option>
+            <option value="Melchizedek|High Priest">High Priest</option>
+            <option value="Melchizedek|Seventy">Seventy</option>
+            <option value="Melchizedek|Bishop">Bishop</option>
+            <option value="Melchizedek|Patriarch">Patriarch</option>
+            <option value="Melchizedek|Apostle">Apostle</option>
+          </optgroup>
+        </select>
+      </div>
+      <div>
+        <label>Date ordained</label>
+        <input type="text" id="ordDate" placeholder="7 January 2025">
+      </div>
+    </div>
+  </div>
+
+  <div class="card preview-card">
+    <h2 style="align-self:flex-start;"><span class="step">4</span>Preview &amp; download</h2>
+    <div id="stage"><canvas id="previewCanvas" width="1200" height="1800"></canvas></div>
+    <div class="actions" style="width:100%;">
+      <button class="ghost" id="genBtn" type="button">Update preview</button>
+      <button class="primary" id="dlBtn" type="button">Download 4×6 image</button>
+    </div>
+    <div class="next-note">To make one for another child, just change the name, office, and date above and download again — no need to re-upload the PDF.</div>
+  </div>
+
+  <p class="privacy">Your PDF is read locally in your browser and is never sent to a server.</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+const FONT = "'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Times New Roman',serif";
+const INK = '#1c1b19';
+const MUTED = '#6f6a61';
+const RULE = '#a39a8a';
+
+const pdfInput = document.getElementById('pdfInput');
+const uploadStatus = document.getElementById('uploadStatus');
+const chainText = document.getElementById('chainText');
+const childName = document.getElementById('childName');
+const officeSel = document.getElementById('office');
+const ordDate = document.getElementById('ordDate');
+const canvas = document.getElementById('previewCanvas');
+const ctx = canvas.getContext('2d');
+const genBtn = document.getElementById('genBtn');
+const dlBtn = document.getElementById('dlBtn');
+
+/* ---------------- PDF text extraction ---------------- */
+
+async function extractLines(pdf) {
+  const lines = [];
+  for (let p = 1; p <= pdf.numPages; p++) {
+    const page = await pdf.getPage(p);
+    const content = await page.getTextContent();
+    const rows = new Map();
+    content.items.forEach(item => {
+      if (!item.str || !item.str.trim()) return;
+      const y = item.transform[5];
+      let key = null;
+      for (const k of rows.keys()) {
+        if (Math.abs(k - y) <= 2) { key = k; break; }
+      }
+      if (key === null) key = y;
+      if (!rows.has(key)) rows.set(key, []);
+      rows.get(key).push(item);
+    });
+    const keys = [...rows.keys()].sort((a, b) => b - a);
+    keys.forEach(k => {
+      const items = rows.get(k).sort((a, b) => a.transform[4] - b.transform[4]);
+      const text = items.map(i => i.str).join(' ').replace(/\s+/g, ' ').trim();
+      if (text) lines.push(text);
+    });
+  }
+  return lines;
+}
+
+/* ---------------- name-vs-description parsing ---------------- */
+
+const NAME_STOPWORDS = new Set(['and','of','the','a','an','de','la','von','van','ii','iii','iv','jr','jr.','sr','sr.']);
+
+function isNameLike(line) {
+  const words = line.replace(/[.,;:]/g, '').split(/\s+/).filter(Boolean);
+  if (!words.length) return false;
+  let unexpected = 0;
+  words.forEach(w => {
+    const bare = w.toLowerCase();
+    const c0 = w[0];
+    if (/[a-z]/.test(c0) && !NAME_STOPWORDS.has(bare)) unexpected++;
+  });
+  return (unexpected / words.length) < 0.25;
+}
+
+function parseEntries(lines) {
+  const cleaned = lines.filter(l => {
+    if (/priesthood line of authority/i.test(l)) return false;
+    if (/^©|intellectual reserve/i.test(l)) return false;
+    if (/^\s*$/.test(l)) return false;
+    return true;
+  });
+  const filtered = cleaned.filter(l => !(/•/.test(l) && /printed/i.test(l)));
+
+  const entries = [];
+  let entry = null;
+  filtered.forEach(line => {
+    const hasDigit = /\d/.test(line);
+    if (!hasDigit && isNameLike(line)) {
+      if (entry) entries.push(entry);
+      entry = { name: line, detail: [] };
+    } else {
+      if (!entry) entry = { name: '', detail: [] };
+      entry.detail.push(line);
+    }
+  });
+  if (entry) entries.push(entry);
+
+  entries.forEach(e => {
+    e.detail = e.detail.map(d =>
+      d.replace(/^Birthdate:\s*/i, 'b. ').replace(/\s-\s/, ' · ')
+    );
+  });
+  return entries.filter(e => e.name);
+}
+
+function entriesToText(entries) {
+  return entries.map(e => [e.name, ...e.detail].join('\n')).join('\n\n');
+}
+
+function textToEntries(text) {
+  return text.split(/\n\s*\n/).map(block => {
+    const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+    if (!lines.length) return null;
+    return { name: lines[0], detail: lines.slice(1) };
+  }).filter(Boolean);
+}
+
+/* ---------------- canvas drawing helpers ---------------- */
+
+function diamond(cx, cy, r, color) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy - r);
+  ctx.lineTo(cx + r, cy);
+  ctx.lineTo(cx, cy + r);
+  ctx.lineTo(cx - r, cy);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function ornament(cxr, y, spread, r, color) {
+  diamond(cxr, y, r, color);
+  diamond(cxr - spread, y, r * 0.6, color);
+  diamond(cxr + spread, y, r * 0.6, color);
+}
+
+function measureTracked(text, spacing) {
+  let w = 0;
+  for (const ch of text) w += ctx.measureText(ch).width;
+  w += spacing * Math.max(0, text.length - 1);
+  return w;
+}
+
+function drawCenteredTracked(text, cx, y, spacing) {
+  const w = measureTracked(text, spacing);
+  let x = cx - w / 2;
+  for (const ch of text) {
+    ctx.fillText(ch, x, y);
+    x += ctx.measureText(ch).width + spacing;
+  }
+  return w;
+}
+
+// Sets font, shrinks to fit maxWidth if needed, draws centered, returns the size used.
+function fitAndDrawCentered(text, cx, y, baseSize, style, maxWidth, spacing, color) {
+  ctx.fillStyle = color;
+  ctx.font = (style + ' ' + baseSize + 'px ' + FONT).trim();
+  let w = measureTracked(text, spacing);
+  let size = baseSize, sp = spacing;
+  if (w > maxWidth && w > 0) {
+    size = baseSize * (maxWidth / w) * 0.99;
+    sp = spacing * (size / baseSize);
+    ctx.font = (style + ' ' + size + 'px ' + FONT).trim();
+  }
+  drawCenteredTracked(text, cx, y, sp);
+  return size;
+}
+
+/* ---------------- main render ---------------- */
+
+function render() {
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2;
+
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#fffdf9';
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.strokeStyle = RULE;
+  ctx.lineWidth = 4;
+  ctx.strokeRect(66, 66, W - 132, H - 132);
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(84, 84, W - 168, H - 168);
+
+  let y = 178;
+  fitAndDrawCentered('PRIESTHOOD LINE OF AUTHORITY', cx, y, 26, '', W - 200, 7, MUTED);
+
+  y += 36;
+  ornament(cx, y, 30, 5, RULE);
+
+  const officeVal = officeSel.value;
+  const parts = officeVal ? officeVal.split('|') : ['Aaronic', ''];
+  const ptype = parts[0], office = parts[1] || '';
+  const cName = childName.value.trim() || 'Child\u2019s Full Name';
+  const dateStr = ordDate.value.trim() || 'Ordination date';
+
+  y += 62;
+  fitAndDrawCentered(cName, cx, y, 46, '', W - 260, 1, INK);
+
+  y += 40;
+  fitAndDrawCentered(ptype + ' Priesthood  ·  ' + (office || 'Office'), cx, y, 25, 'italic', W - 220, 0, MUTED);
+
+  y += 32;
+  fitAndDrawCentered('Ordained ' + dateStr, cx, y, 25, 'italic', W - 220, 0, MUTED);
+
+  y += 42;
+  ctx.strokeStyle = RULE;
+  ctx.lineWidth = 1.3;
+  ctx.beginPath(); ctx.moveTo(cx - 200, y); ctx.lineTo(cx + 200, y); ctx.stroke();
+
+  const chainTop = y + 44;
+  const footerOrnY = H - 128;
+  const chainBottom = footerOrnY - 56;
+
+  const entries = textToEntries(chainText.value);
+  entries.push({ name: cName, detail: [(office || 'Office') + '  ·  ' + dateStr] });
+
+  drawChain(entries, cx, chainTop, chainBottom, W - 220);
+
+  ornament(cx, footerOrnY, 26, 4, RULE);
+}
+
+function drawChain(entries, cx, top, bottom, maxWidth) {
+  const n = entries.length;
+  const NAME_SZ = 30, DET_SZ = 22, NAME_LEAD = 37, DET_LEAD = 28;
+
+  const baseSizes = entries.map((e, i) => {
+    if (i === 0) return 46;
+    if (i === n - 1) return NAME_SZ + 5;
+    return NAME_SZ;
+  });
+  const baseLeads = baseSizes.map(s => s * (NAME_LEAD / NAME_SZ));
+  const baseHeights = entries.map((e, i) => baseLeads[i] + DET_LEAD * e.detail.length);
+  const baseTotal = baseHeights.reduce((a, b) => a + b, 0);
+
+  const gapsN = Math.max(0, n - 1);
+  const minGap = 12;
+  const available = Math.max(0, bottom - top);
+  let scale = 1;
+  const neededMin = baseTotal + minGap * gapsN;
+  if (neededMin > available && neededMin > 0) {
+    scale = Math.max(0.5, available / neededMin);
+  }
+
+  const sizes = baseSizes.map(s => s * scale);
+  const leads = baseLeads.map(l => l * scale);
+  const detSize = DET_SZ * scale;
+  const detLead = DET_LEAD * scale;
+  const heights = entries.map((e, i) => leads[i] + detLead * e.detail.length);
+  const total = heights.reduce((a, b) => a + b, 0);
+
+  let gap = gapsN > 0 ? (available - total) / gapsN : 0;
+  const gapCap = detLead * 2.6;
+  const usedGap = Math.min(Math.max(gap, minGap * scale * 0.9), gapCap);
+  const totalUsed = total + usedGap * gapsN;
+  let y = top + Math.max(0, (available - totalUsed) / 2);
+
+  entries.forEach((e, i) => {
+    const isLast = i === n - 1;
+    y += sizes[i];
+    const fitted = fitAndDrawCentered(e.name, cx, y, sizes[i], '', maxWidth, 0.4, INK);
+    if (isLast) {
+      ctx.font = fitted + 'px ' + FONT;
+      const w = measureTracked(e.name, 0.4);
+      diamond(cx - w / 2 - 16, y - fitted * 0.32, 3, RULE);
+      diamond(cx + w / 2 + 16, y - fitted * 0.32, 3, RULE);
+    }
+    y += leads[i] - sizes[i];
+
+    e.detail.forEach(line => {
+      y += detSize;
+      fitAndDrawCentered(line, cx, y, detSize, 'italic', maxWidth, 0, MUTED);
+      y += detLead - detSize;
+    });
+
+    if (!isLast) {
+      ctx.strokeStyle = RULE;
+      ctx.lineWidth = 1;
+      const midY = y + usedGap / 2;
+      ctx.beginPath(); ctx.moveTo(cx, midY - 9); ctx.lineTo(cx, midY + 9); ctx.stroke();
+      y += usedGap;
+    }
+  });
+}
+
+/* ---------------- wiring ---------------- */
+
+pdfInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  uploadStatus.textContent = 'Reading PDF…';
+  uploadStatus.classList.remove('err');
+  try {
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    const lines = await extractLines(pdf);
+    const entries = parseEntries(lines);
+    if (!entries.length) throw new Error('No entries parsed');
+    chainText.value = entriesToText(entries);
+    uploadStatus.textContent = 'Parsed ' + entries.length + ' names from the PDF — check them over below.';
+    render();
+  } catch (err) {
+    console.error(err);
+    uploadStatus.textContent = "Couldn't read that PDF automatically — paste or type the chain into the box below instead.";
+    uploadStatus.classList.add('err');
+  }
+});
+
+let renderTimer;
+function scheduleRender() {
+  clearTimeout(renderTimer);
+  renderTimer = setTimeout(render, 150);
+}
+[chainText, childName, ordDate].forEach(el => el.addEventListener('input', scheduleRender));
+officeSel.addEventListener('change', scheduleRender);
+genBtn.addEventListener('click', render);
+
+dlBtn.addEventListener('click', () => {
+  render();
+  const safe = (childName.value.trim() || 'child').replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase();
+  const link = document.createElement('a');
+  link.download = 'priesthood-line-of-authority-' + safe + '-4x6.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
+render();
+</script>
+</body>
+</html>
