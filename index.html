@@ -83,7 +83,6 @@
   }
   .primary{ background:var(--ink); color:#fff; width:100%; }
   .primary:disabled{ background:#c8c3b8; cursor:not-allowed; }
-  .ghost{ background:#fff; border:1px solid var(--line); color:var(--ink); width:100%; }
   .actions{ display:flex; flex-direction:column; gap:9px; margin-top:4px; }
   .preview-card{ display:flex; flex-direction:column; align-items:center; }
   #stage{
@@ -169,7 +168,6 @@ Apostle · 1829
     <h2 style="align-self:flex-start;"><span class="step">4</span>Preview &amp; download</h2>
     <div id="stage"><canvas id="previewCanvas" width="1200" height="1800"></canvas></div>
     <div class="actions" style="width:100%;">
-      <button class="ghost" id="genBtn" type="button">Update preview</button>
       <button class="primary" id="dlBtn" type="button">Download 4×6 image</button>
     </div>
     <div class="next-note">To print another copy — for yourself or a different child — just change the selection above and download again. No need to re-upload the PDF.</div>
@@ -195,7 +193,6 @@ const officeSel = document.getElementById('office');
 const ordDate = document.getElementById('ordDate');
 const canvas = document.getElementById('previewCanvas');
 const ctx = canvas.getContext('2d');
-const genBtn = document.getElementById('genBtn');
 const dlBtn = document.getElementById('dlBtn');
 const forSelfRadio = document.getElementById('forSelf');
 const forChildRadio = document.getElementById('forChild');
@@ -506,7 +503,6 @@ function scheduleRender() {
 }
 [chainText, childName, ordDate].forEach(el => el.addEventListener('input', scheduleRender));
 officeSel.addEventListener('change', scheduleRender);
-genBtn.addEventListener('click', render);
 
 dlBtn.addEventListener('click', () => {
   render();
