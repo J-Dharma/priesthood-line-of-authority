@@ -125,7 +125,7 @@ Peter, James, and John
 ordained Apostles by the Savior during His earthly ministry
 
 Joseph Smith Jr.
-Apostle · 1829 · b. 23 Dec 1805
+Apostle · 1829
 
 ..."></textarea>
   </div>
@@ -271,9 +271,9 @@ function parseEntries(lines) {
   if (entry) entries.push(entry);
 
   entries.forEach(e => {
-    e.detail = e.detail.map(d =>
-      d.replace(/^Birthdate:\s*/i, 'b. ').replace(/\s-\s/, ' · ')
-    );
+    e.detail = e.detail
+      .filter(d => !/^birthdate\s*:/i.test(d))
+      .map(d => d.replace(/\s-\s/, ' · '));
   });
   return entries.filter(e => e.name);
 }
@@ -375,7 +375,10 @@ function render() {
   const footerOrnY = H - 150;
   const chainBottom = footerOrnY - 56;
 
-  let entries = textToEntries(chainText.value);
+  let entries = textToEntries(chainText.value).map(e => ({
+    name: e.name,
+    detail: e.detail.filter(d => !/^b\.\s|^birthdate\s*:/i.test(d))
+  }));
 
   if (forChildRadio.checked) {
     const officeVal = officeSel.value;
